@@ -1,0 +1,23 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+type: command
+
+name: train_test_split
+display_name: Train_Test_Split
+
+environment: azureml:AzureML-sklearn-1.0-ubuntu20.04-py38-cpu:1
+
+inputs:
+  input_data:
+    type: uri_file
+
+outputs:
+  train_data:
+    type: uri_file
+  test_data:
+    type: uri_file
+
+command: >-
+  python component.py
+  --input_data ${{inputs.input_data}} 
+  --training_data_path ${{outputs.train_data}}
+  --test_data_path ${{outputs.test_data}}
