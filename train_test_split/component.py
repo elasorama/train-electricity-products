@@ -3,8 +3,8 @@ import pandas as pd
 import argparse
 from sklearn.model_selection import train_test_split
 
-# Defining the constant for the seconds in day
-SECONDS_IN_DAY = 86400
+# Importing the mlflow tracking 
+import mlflow
 
 # Defining the component function
 def prep_data(
@@ -18,13 +18,19 @@ def prep_data(
     # Reading the data from the input folder
     data = pd.read_parquet(input_data)
 
-    # Printing some stats about the data
-    print(f"Data shape: {data.shape}")
-    print(f"Data columns: {data.columns.tolist()}")
+    # Initiating the experiment 
+    mlflow.set_experiment("Initial_pipeline")
+
+    # Logging the number of rows
+    mlflow.log_metric("N_rows_total", len(data))
     
     # Splitting the data into train and test
     train, test = train_test_split(data, test_size=0.2, random_state=42)
     
+    # Logging the number of rows
+    mlflow.log_metric("N_rows_train", len(train))
+    mlflow.log_metric("N_rows_test", len(test))
+
     # Saving the data into the output folder
     train.to_parquet(training_data_path, index=False)
     test.to_parquet(test_data_path, index=False)

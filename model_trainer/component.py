@@ -13,11 +13,17 @@ import argparse
 # Numpy 
 import numpy as np
 
+# Importing mlflow 
+import mlflow
+
 # Defining the model training function 
 def train_model(
         input_data_path: str,
         output_model_path: str
 ): 
+    # Starting the mlflow instance
+    mlflow.set_experiment("Initial_pipeline")
+
     # Reading the data 
     data = pd.read_parquet(input_data_path)
 
@@ -42,11 +48,18 @@ def train_model(
     # Predicting on the train set 
     y_pred = model.predict(X)
 
-    # Calculating and printing the mae and mape 
+    # Logging the train mse, mae and mape
     mae = np.mean(np.abs(y - y_pred))
+    mse = np.mean(np.square(y - y_pred))
     mape = np.mean(np.abs((y - y_pred) / y))
-    print(f"mae: {mae}")
-    print(f"mape: {mape}")
+
+    # Logging the metrics
+    mlflow.log_metric("train_mae", mae)
+    mlflow.log_metric("train_mse", mse)
+    mlflow.log_metric("train_mape", mape)
+
+    # Logging the model 
+    mlflow.sklearn.log_model(model, "model")
 
     # Saving the model
     pickle.dump(model, open(output_model_path, 'wb'))

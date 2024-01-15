@@ -10,11 +10,14 @@ import argparse
 # Numpy 
 import numpy as np
 
-# Json wrangling 
-import json
+# Mlflow logging
+import mlflow
+
+# Ploting 
+import matplotlib.pyplot as plt
 
 # Defining the model training function 
-def train_model(
+def eval_model(
         input_data_path: str,
         input_model_path: str,
         output_dir: str
@@ -33,6 +36,9 @@ def train_model(
     X_columns = columns[1:]
     y_column = columns[0]
 
+    # Setting the run id for mlflow tracking 
+    mlflow.set_experiment("Initial_pipeline")
+
     # Splitting the data into X and y
     X = data[X_columns]
     y = data[y_column]
@@ -40,6 +46,12 @@ def train_model(
     # Predicting on the train set 
     y_pred = model.predict(X)
 
+    # Saving the figure of the real vs predicted values
+    plt.plot(y, label="real")
+    plt.plot(y_pred, label="predicted")
+    plt.legend()
+    mlflow.log_figure(plt.gcf(), "real_vs_predicted.png")
+    
     # Calculating and printing the mae, mse and mape 
     mae = np.mean(np.abs(y - y_pred))
     mse = np.mean(np.square(y - y_pred))
@@ -48,17 +60,14 @@ def train_model(
     print(f"mse: {mse}")
     print(f"mape: {mape}")
 
-    # Saving the acc metrics on the test set 
-    acc = {
-        "mae": mae,
-        "mape": mape,
-        "mse": mse,
-        "N": len(y),
-    }
+    # Logging the metrics
+    mlflow.log_metric("mae", mae)
+    mlflow.log_metric("mse", mse)
+    mlflow.log_metric("mape", mape)
+    mlflow.log_metric("N_test", len(y))
 
-    # Saving the acc dict 
-    with open(f"{output_dir}/acc.json", "w") as f:
-        json.dump(acc, f)
+    # Logging the model 
+    mlflow.sklearn.log_model(model, "model")
 
     # Saving the model
     pickle.dump(model, open(f"{output_dir}/model.pkl", 'wb'))
@@ -93,8 +102,8 @@ if __name__ == '__main__':
     print(f"output_model_path: {args.output_dir}")
 
     # Calling the model training function
-    train_model(
+    eval_model(
         input_data_path=args.input_data,
         input_model_path=args.input_model_path,
-        output_model_path=args.output_dir,
+        output_dir=args.output_dir,
     )
