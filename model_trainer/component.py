@@ -16,6 +16,10 @@ import numpy as np
 # Importing mlflow 
 import mlflow
 
+# Model signature
+from mlflow.models.signature import ModelSignature
+from mlflow.types.schema import Schema, ColSpec
+
 # Defining the model training function 
 def train_model(
         input_data_path: str,
@@ -58,8 +62,17 @@ def train_model(
     mlflow.log_metric("train_mse", mse)
     mlflow.log_metric("train_mape", mape)
 
-    # Logging the model 
-    mlflow.sklearn.log_model(model, "model")
+    # Creating the input schema for the model 
+    input_schema = Schema([ColSpec("double", x) for x in X_columns])
+
+    # Creating the output schema for the model
+    output_schema = Schema([ColSpec("double", y_column)])
+
+    # Creating the signature for the model
+    signature = ModelSignature(inputs=input_schema, outputs=output_schema)
+
+    # Logging the model and the signature
+    mlflow.sklearn.log_model(model, "model", signature=signature)
 
     # Saving the model
     pickle.dump(model, open(output_model_path, 'wb'))
