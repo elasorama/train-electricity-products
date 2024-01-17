@@ -25,9 +25,6 @@ def train_model(
         input_data_path: str,
         output_model_path: str
 ): 
-    # Starting the mlflow instance
-    mlflow.set_experiment("Initial_pipeline")
-
     # Reading the data 
     data = pd.read_parquet(input_data_path)
 

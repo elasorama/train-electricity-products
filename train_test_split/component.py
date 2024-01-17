@@ -18,9 +18,6 @@ def prep_data(
     # Reading the data from the input folder
     data = pd.read_parquet(input_data)
 
-    # Initiating the experiment 
-    mlflow.set_experiment("Initial_pipeline")
-
     # Logging the number of rows
     mlflow.log_metric("N_rows_total", len(data))
     

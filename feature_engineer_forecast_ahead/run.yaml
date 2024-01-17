@@ -1,0 +1,27 @@
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+type: command
+
+name: feature_engineer_n_ahead
+display_name: Feature engineer for n ahead time steps
+
+environment: azureml:AzureML-sklearn-1.0-ubuntu20.04-py38-cpu:1
+
+inputs:
+  input_data:
+    type: uri_file
+  # Time range in hours ahead to forecast
+  time_range_ahead:
+    type: number
+  dependant_variable:
+    type: string
+
+outputs:
+  output_data:
+    type: uri_file
+
+command: >-
+  python component.py
+  --input_data ${{inputs.input_data}} 
+  --dependant_variable ${{inputs.dependant_variable}}
+  --time_range_ahead ${{inputs.time_range_ahead}}
+  --output_data ${{outputs.output_data}}

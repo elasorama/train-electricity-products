@@ -36,9 +36,6 @@ def eval_model(
     X_columns = columns[1:]
     y_column = columns[0]
 
-    # Setting the run id for mlflow tracking 
-    mlflow.set_experiment("Initial_pipeline")
-
     # Splitting the data into X and y
     X = data[X_columns]
     y = data[y_column]
@@ -50,7 +47,12 @@ def eval_model(
     plt.plot(y, label="real")
     plt.plot(y_pred, label="predicted")
     plt.legend()
-    mlflow.log_figure(plt.gcf(), "real_vs_predicted.png")
+
+    # Saving the image to local dir 
+    plt.savefig(f"{output_dir}/real_vs_predicted.png")
+
+    # Logging the image to mlflow
+    mlflow.log_artifact(f"{output_dir}/real_vs_predicted.png")
     
     # Calculating and printing the mae, mse and mape 
     mae = np.mean(np.abs(y - y_pred))
