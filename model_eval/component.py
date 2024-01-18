@@ -16,6 +16,9 @@ import mlflow
 # Ploting 
 import matplotlib.pyplot as plt
 
+# Image wrangling 
+from PIL import Image
+
 # Defining the model training function 
 def eval_model(
         input_data_path: str,
@@ -48,11 +51,17 @@ def eval_model(
     plt.plot(y_pred, label="predicted")
     plt.legend()
 
-    # Saving the image to local dir 
-    plt.savefig(f"{output_dir}/real_vs_predicted.png")
+    # Defining the output name for the image 
+    output_name = f"{output_dir}/real_vs_predicted.png"
 
-    # Logging the image to mlflow
-    mlflow.log_artifact(f"{output_dir}/real_vs_predicted.png")
+    # Saving the image to local dir 
+    plt.savefig(output_name)
+
+    # Converting the image into an array 
+    image = Image.open(output_name)
+    
+    # Saving to mlflow 
+    mlflow.log_image(image, output_name)
     
     # Calculating and printing the mae, mse and mape 
     mae = np.mean(np.abs(y - y_pred))
