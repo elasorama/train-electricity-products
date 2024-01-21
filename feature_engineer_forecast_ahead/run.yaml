@@ -9,9 +9,11 @@ environment: azureml:AzureML-sklearn-1.0-ubuntu20.04-py38-cpu:1
 inputs:
   input_data:
     type: uri_file
-  # Time range in hours ahead to forecast
+  # Time ranges in hours ahead to forecast
+  # The default time ranges are 5, 15, 60
   time_range_ahead:
-    type: number
+    type: string
+    default: "5,15,60"
   dependant_variable:
     type: string
 

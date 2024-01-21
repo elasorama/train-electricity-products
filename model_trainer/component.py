@@ -1,6 +1,9 @@
 # Importing linear regression
 from sklearn.linear_model import LinearRegression
 
+# Multioutput regressor
+from sklearn.multioutput import MultiOutputRegressor
+
 # Pickle for saving the model
 import pickle
 
@@ -31,17 +34,17 @@ def train_model(
     # Saving the columns 
     columns = data.columns.tolist()
 
-    # The X features will be seconds_since_midnight_sin, seconds_since_midnight_cos
-    # The remaining column will be the y feature
-    X_columns = columns[1:]
-    y_column = columns[0]
+    # The X features are the last two columns
+    # The remaining columns are the y features
+    X_columns = columns[-2:]
+    y_column = columns[:-2]
 
     # Splitting the data into X and y
     X = data[X_columns]
     y = data[y_column]
 
     # Creating the model
-    model = LinearRegression()
+    model = MultiOutputRegressor(LinearRegression())
 
     # Fitting the model
     model.fit(X, y)

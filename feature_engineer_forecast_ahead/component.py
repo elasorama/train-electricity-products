@@ -27,7 +27,7 @@ def convert_hour_of_day(hour, minute) -> dict:
 def prep_data(
     input_data: str,
     dependant_variable: str,
-    time_range_ahead: int,
+    time_range_ahead: str,
     output_data: str,
 ):
     """
@@ -39,8 +39,8 @@ def prep_data(
 
     The output data will have the following columns:
     - dependant_variable
-    - seconds_since_midnight_sin
-    - seconds_since_midnight_cos
+    - minutes_since_midnight_sin
+    - minutes_since_midnight_cos
     """
     # Reading the data from the input folder
     data = pd.read_parquet(input_data)
@@ -55,17 +55,25 @@ def prep_data(
     # Appending the two columns to the data
     data = pd.concat([data, minutes_in_day], axis=1)
 
-    # Creating the sum of dependant variable usage for the next time_range_ahead minutes
-    data[dependant_variable] = data[dependant_variable].rolling(time_range_ahead).sum()
+    # Converting the time_range_ahead string to list of ints
+    time_range_ahead = [int(time_range) for time_range in time_range_ahead.split(",")]
+
+    # Creating a new column for each of the time ranges
+    for time_range in time_range_ahead:
+        # Creating the sum of dependant variable usage for the next time_range_ahead minutes
+        data[f"{dependant_variable}_{time_range}"] = data[dependant_variable].rolling(time_range).sum()
 
     # Dropping the rows with nan values
     data.dropna(inplace=True)
 
     # Only leaving the needed columns 
-    data = data[[dependant_variable, "minutes_since_midnight_sin", "minutes_since_midnight_cos"]]
+    data = data[[f"{dependant_variable}_{time_range}" for time_range in time_range_ahead] + ["minutes_since_midnight_sin", "minutes_since_midnight_cos"]]
 
     # Saving the data into the output folder
     data.to_parquet(output_data, index=False)
+
+    # Returning from the function
+    return
 
 if __name__ == '__main__': 
     # Parsing the arguments
@@ -85,7 +93,7 @@ if __name__ == '__main__':
 
     parser.add_argument(
         '--time_range_ahead',
-        type=int,
+        type=str,
         help="Time range ahead to predict",
     )
 

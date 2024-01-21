@@ -11,6 +11,7 @@ def prep_data(
     input_data: str,
     training_data_path: str,
     test_data_path: str,
+    train_test_split_ratio: float = 0.75
 ):
     """
     Prepares the data for training and testing
@@ -22,7 +23,7 @@ def prep_data(
     mlflow.log_metric("N_rows_total", len(data))
     
     # Splitting the data into train and test
-    train, test = train_test_split(data, test_size=0.2, random_state=42)
+    train, test = train_test_split(data, train_size=train_test_split_ratio, random_state=42)
     
     # Logging the number of rows
     mlflow.log_metric("N_rows_train", len(train))
@@ -54,11 +55,18 @@ if __name__ == '__main__':
         help="Path to the test data",
     )
 
+    parser.add_argument(
+        "--train_test_split",
+        type=float,
+        help="Share of train data in the input data",
+    )
+
     args = parser.parse_args()
 
     # Printing the arguments
     print(f"input_data: {args.input_data}")
     print(f"training_data_path: {args.training_data_path}")
+    print(f"share of train data: {args.train_test_split}")
     print(f"test_data_path: {args.test_data_path}")
 
     # Calling the component function
@@ -66,4 +74,5 @@ if __name__ == '__main__':
         args.input_data,
         args.training_data_path,
         args.test_data_path,
+        args.train_test_split
     )

@@ -34,10 +34,10 @@ def eval_model(
     # Saving the columns 
     columns = data.columns.tolist()
 
-    # The X features will be seconds_since_midnight_sin, seconds_since_midnight_cos
-    # The remaining column will be the y feature
-    X_columns = columns[1:]
-    y_column = columns[0]
+    # The X features are the last two columns
+    # The remaining columns are the y features
+    X_columns = columns[-2:]
+    y_column = columns[:-2]
 
     # Splitting the data into X and y
     X = data[X_columns]
@@ -45,43 +45,17 @@ def eval_model(
 
     # Predicting on the train set 
     y_pred = model.predict(X)
-
-    # Saving the figure of the real vs predicted values
-    plt.plot(y, label="real")
-    plt.plot(y_pred, label="predicted")
-    plt.legend()
-
-    # Defining the output name for the image 
-    output_name = f"{output_dir}/real_vs_predicted.png"
-
-    # Saving the image to local dir 
-    plt.savefig(output_name)
-
-    # Converting the image into an array 
-    image = Image.open(output_name)
-    
-    # Saving to mlflow 
-    mlflow.log_image(image, output_name)
     
     # Calculating and printing the mae, mse and mape 
     mae = np.mean(np.abs(y - y_pred))
     mse = np.mean(np.square(y - y_pred))
     mape = np.mean(np.abs((y - y_pred) / y))
-    print(f"mae: {mae}")
-    print(f"mse: {mse}")
-    print(f"mape: {mape}")
 
     # Logging the metrics
-    mlflow.log_metric("mae", mae)
-    mlflow.log_metric("mse", mse)
-    mlflow.log_metric("mape", mape)
+    mlflow.log_metric("test_mae", mae)
+    mlflow.log_metric("test_mse", mse)
+    mlflow.log_metric("test_mape", mape)
     mlflow.log_metric("N_test", len(y))
-
-    # Logging the model 
-    mlflow.sklearn.log_model(model, "model")
-
-    # Saving the model
-    pickle.dump(model, open(f"{output_dir}/model.pkl", 'wb'))
 
 if __name__ == '__main__':
     # Parsing the arguments

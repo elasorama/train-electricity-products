@@ -2,3 +2,4 @@ electricity-models/
 .env
 __pycache__/
 .vscode/
+mlruns/

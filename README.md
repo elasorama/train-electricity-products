@@ -35,3 +35,11 @@ To install the requirements, run the following command:
 ```bash
 pip install -r requirements.txt
 ```
+
+# Testing 
+
+To run tests, run the command: 
+    
+```bash
+pytest
+```

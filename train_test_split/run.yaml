@@ -9,6 +9,9 @@ environment: azureml:AzureML-sklearn-1.0-ubuntu20.04-py38-cpu:1
 inputs:
   input_data:
     type: uri_file
+  train_test_split:
+    type: number
+    default: 0.8    
 
 outputs:
   train_data:
@@ -20,4 +23,5 @@ command: >-
   python component.py
   --input_data ${{inputs.input_data}} 
   --training_data_path ${{outputs.train_data}}
+  --train_test_split ${{inputs.train_test_split}}
   --test_data_path ${{outputs.test_data}}
