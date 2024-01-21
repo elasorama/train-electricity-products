@@ -22,7 +22,7 @@ def test_pipeline() -> None:
     tmp_dir = tempfile.mkdtemp()
 
     # Defining the path to the input data
-    input_data_path = os.path.join(cur_dir, "..", "..", "test_data", "2024-1-17-11-0_2024-1-17-18-59.parquet")
+    input_data_path = os.path.join(cur_dir, "..", "..", "test_data", "2024-01-20-14-02_2024-01-21-13-57.parquet")
 
     # Defining the output train and test data path 
     train_data_path = os.path.join(tmp_dir, "train.parquet")

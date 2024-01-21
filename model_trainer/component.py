@@ -1,6 +1,9 @@
 # Importing linear regression
 from sklearn.linear_model import LinearRegression
 
+# sklearn ensemble regressors
+from sklearn.ensemble import GradientBoostingRegressor
+
 # Multioutput regressor
 from sklearn.multioutput import MultiOutputRegressor
 
@@ -23,6 +26,10 @@ import mlflow
 from mlflow.models.signature import ModelSignature
 from mlflow.types.schema import Schema, ColSpec
 
+# Ploting 
+import numpy as np 
+import matplotlib.pyplot as plt
+
 # Defining the model training function 
 def train_model(
         input_data_path: str,
@@ -44,7 +51,7 @@ def train_model(
     y = data[y_column]
 
     # Creating the model
-    model = MultiOutputRegressor(LinearRegression())
+    model = MultiOutputRegressor(GradientBoostingRegressor())
 
     # Fitting the model
     model.fit(X, y)
@@ -64,11 +71,37 @@ def train_model(
         mlflow.log_metric(f"train_mse_{column}", mse)
         mlflow.log_metric(f"train_mape_{column}", mape)
 
+    # Creating linespaces for the X features
+    x1 = np.linspace(-1, 1, 100)
+    x2 = np.linspace(-1, 1, 100)
+
+    # Creating the meshgrid
+    x1, x2 = np.meshgrid(x1, x2)
+
+    # Creating the input features
+    X = np.array([x1.flatten(), x2.flatten()]).T
+
+    # Predicting on the meshgrid
+    y_pred = model.predict(X)
+
+    # Creating a heatmap picture where the X and Y axes are the input features
+    # and the color is the output feature
+
+    # Creating the sequences of X and Z features
+    plt.imshow(y_pred[:, 0].reshape(100, 100), extent=[-1, 1, -1, 1], origin='lower')
+    plt.colorbar()
+    plt.xlabel(X_columns[0])
+    plt.ylabel(X_columns[1])
+    plt.title(y_column[0])
+
+    # Logging the heatmap picture
+    mlflow.log_figure(plt.gcf(), "heatmap.png")
+
     # Creating the input schema for the model 
     input_schema = Schema([ColSpec("double", x) for x in X_columns])
 
     # Creating the output schema for the model
-    output_schema = Schema([ColSpec("double", y_column)])
+    output_schema = Schema([ColSpec("double", y) for y in y_column])
 
     # Creating the signature for the model
     signature = ModelSignature(inputs=input_schema, outputs=output_schema)

@@ -13,12 +13,6 @@ import numpy as np
 # Mlflow logging
 import mlflow
 
-# Ploting 
-import matplotlib.pyplot as plt
-
-# Image wrangling 
-from PIL import Image
-
 # Defining the model training function 
 def eval_model(
         input_data_path: str,

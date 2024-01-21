@@ -19,6 +19,7 @@ def convert_hour_of_day(hour, minute) -> dict:
 
     # Returning the created features
     return {
+        "minutes_since_midnight": minutes_since_midnight,
         "minutes_since_midnight_sin": minutes_since_midnight_sin,
         "minutes_since_midnight_cos": minutes_since_midnight_cos,
     }
@@ -54,6 +55,9 @@ def prep_data(
 
     # Appending the two columns to the data
     data = pd.concat([data, minutes_in_day], axis=1)
+
+    # Sorting by minutes since midnight 
+    data.sort_values(by="minutes_since_midnight", inplace=True)
 
     # Converting the time_range_ahead string to list of ints
     time_range_ahead = [int(time_range) for time_range in time_range_ahead.split(",")]
