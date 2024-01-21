@@ -52,15 +52,17 @@ def train_model(
     # Predicting on the train set 
     y_pred = model.predict(X)
 
-    # Logging the train mse, mae and mape
-    mae = np.mean(np.abs(y - y_pred))
-    mse = np.mean(np.square(y - y_pred))
-    mape = np.mean(np.abs((y - y_pred) / y))
+    # Logging the metrics for each of the columns
+    for i, column in enumerate(y_column):
+        # Calculating the metrics
+        mae = np.mean(np.abs(y[column] - y_pred[:, i]))
+        mse = np.mean(np.square(y[column] - y_pred[:, i]))
+        mape = np.mean(np.abs((y[column] - y_pred[:, i]) / y[column]))
 
-    # Logging the metrics
-    mlflow.log_metric("train_mae", mae)
-    mlflow.log_metric("train_mse", mse)
-    mlflow.log_metric("train_mape", mape)
+        # Logging the metrics 
+        mlflow.log_metric(f"train_mae_{column}", mae)
+        mlflow.log_metric(f"train_mse_{column}", mse)
+        mlflow.log_metric(f"train_mape_{column}", mape)
 
     # Creating the input schema for the model 
     input_schema = Schema([ColSpec("double", x) for x in X_columns])

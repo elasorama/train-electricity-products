@@ -46,16 +46,17 @@ def eval_model(
     # Predicting on the train set 
     y_pred = model.predict(X)
     
-    # Calculating and printing the mae, mse and mape 
-    mae = np.mean(np.abs(y - y_pred))
-    mse = np.mean(np.square(y - y_pred))
-    mape = np.mean(np.abs((y - y_pred) / y))
+    # Logging the metrics for each of the columns
+    for i, column in enumerate(y_column):
+        # Calculating the metrics
+        mae = np.mean(np.abs(y[column] - y_pred[:, i]))
+        mse = np.mean(np.square(y[column] - y_pred[:, i]))
+        mape = np.mean(np.abs((y[column] - y_pred[:, i]) / y[column]))
 
-    # Logging the metrics
-    mlflow.log_metric("test_mae", mae)
-    mlflow.log_metric("test_mse", mse)
-    mlflow.log_metric("test_mape", mape)
-    mlflow.log_metric("N_test", len(y))
+        # Logging the metrics 
+        mlflow.log_metric(f"train_mae_{column}", mae)
+        mlflow.log_metric(f"train_mse_{column}", mse)
+        mlflow.log_metric(f"train_mape_{column}", mape)
 
 if __name__ == '__main__':
     # Parsing the arguments

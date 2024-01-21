@@ -61,7 +61,7 @@ def prep_data(
     # Creating a new column for each of the time ranges
     for time_range in time_range_ahead:
         # Creating the sum of dependant variable usage for the next time_range_ahead minutes
-        data[f"{dependant_variable}_{time_range}"] = data[dependant_variable].rolling(time_range).sum()
+        data[f"{dependant_variable}_{time_range}"] = data[dependant_variable].rolling(time_range).sum().shift(-time_range)
 
     # Dropping the rows with nan values
     data.dropna(inplace=True)
